@@ -1,4 +1,6 @@
-﻿namespace BotTemplate.BotCore.Interactions.AutoComplete
+﻿using Discord.Interactions;
+
+namespace BotTemplate.BotCore.Interactions.AutoComplete
 {
     public class AutoComplete : AutocompleteHandler
     {

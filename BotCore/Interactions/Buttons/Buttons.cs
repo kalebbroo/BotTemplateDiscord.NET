@@ -1,4 +1,6 @@
-﻿namespace BotTemplate.BotCore.Interactions.Buttons
+﻿using Discord.Interactions;
+
+namespace BotTemplate.BotCore.Interactions.Buttons
 {
     public class Buttons : InteractionsCore
     {

@@ -1,4 +1,6 @@
-﻿namespace BotTemplate.BotCore.Interactions.SelectMenus
+﻿using Discord.Interactions;
+
+namespace BotTemplate.BotCore.Interactions.SelectMenus
 {
     public class SelectMenus : InteractionsCore
     {

@@ -1,9 +1,13 @@
-﻿namespace BotTemplate.BotCore.Helpers;
+﻿using Discord.Interactions;
+using Discord.Commands;
+
+namespace BotTemplate.BotCore.Helpers;
 
 public static class DiscordHelpers
 {
-    /// <summary>Ran when the Discord client is ready. This method logs information about the bot, registers commands globally, and sets the bot's status.
-    /// Add or edit the logic here to run the moment the bot is online and read.</summary>
+    /// <summary>Ran when the Discord client is ready. This method logs information about the bot, 
+    /// registers commands globally, and sets the bot's status.
+    /// Add or edit the logic here to run the moment the bot is online and ready.</summary>
     /// <param name="serviceProvider">The service provider to resolve dependencies.</param>
     internal static async Task ClientReady(IServiceProvider serviceProvider)
     {
@@ -12,12 +16,18 @@ public static class DiscordHelpers
         {
             DiscordSocketClient client = serviceProvider.GetRequiredService<DiscordSocketClient>();
             InteractionService interactions = serviceProvider.GetRequiredService<InteractionService>();
-            // In this section you need to choose whether to register commands globally or per guild. I normally register them per guild during development.
-            // To register commands globally, move RegisterCommandsGloballyAsync() after AddModulesAsync() and remove the for loop.
+            CommandService commands = serviceProvider.GetRequiredService<CommandService>();
+
+            // In this section you need to choose whether to register commands globally or per guild. 
+            // I normally register them per guild during development.
+            // To register commands globally, move RegisterCommandsGloballyAsync() after AddModulesAsync() 
+            // and remove the for loop.
             await interactions!.RegisterCommandsGloballyAsync(true); // Running it before AddModulesAsync() will clear all global commands // DEBUG ONLY
+
             if (client!.Guilds.Count != 0)
             {
-                // Scans the whole assembly for classes that define slash commands and registers the command modules with the InteractionService.
+                // Scans the whole assembly for classes that define slash commands and registers 
+                // the command modules with the InteractionService.
                 await interactions!.AddModulesAsync(Assembly.GetEntryAssembly(), serviceProvider);
                 foreach (SocketGuild? guild in client.Guilds)
                 {
@@ -30,8 +40,11 @@ public static class DiscordHelpers
             }
             logger?.LogInformation("Logged in as {Username}", client.CurrentUser.Username);
             logger?.LogInformation("Registered {Count} slash commands", interactions!.SlashCommands.Count);
+            logger?.LogInformation("Registered {Count} text commands across {ModuleCount} modules",
+                commands.Commands.Count(),
+                commands.Modules.Count());
             logger?.LogInformation("Bot is a member of {Count} guilds", client.Guilds.Count);
-            await client.SetGameAsync("/help", null, ActivityType.Listening);
+            await client.SetGameAsync("/help or !help", null, ActivityType.Listening); // Set the bot's status
         }
         catch (Exception ex)
         {

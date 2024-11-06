@@ -1,4 +1,6 @@
-﻿namespace BotTemplate.BotCore.Interactions;
+﻿using Discord.Interactions;
+
+namespace BotTemplate.BotCore.Interactions;
 
 public class InteractionsCore : InteractionModuleBase<SocketInteractionContext>
 {

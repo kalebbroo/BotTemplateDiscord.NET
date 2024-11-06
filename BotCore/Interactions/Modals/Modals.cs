@@ -1,4 +1,6 @@
-﻿namespace BotTemplate.BotCore.Interactions.Modals
+﻿using Discord.Interactions;
+
+namespace BotTemplate.BotCore.Interactions.Modals
 {
     public class Modals : InteractionsCore
     {

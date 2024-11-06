@@ -1,4 +1,5 @@
-﻿using static BotTemplate.BotCore.Interactions.Modals.Modals;
+﻿using Discord.Interactions;
+using static BotTemplate.BotCore.Interactions.Modals.Modals;
 
 namespace BotTemplate.BotCore.Interactions.SlashCommands
 {

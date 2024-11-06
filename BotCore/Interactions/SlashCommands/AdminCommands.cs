@@ -1,4 +1,6 @@
-﻿namespace BotTemplate.BotCore.Interactions.SlashCommands
+﻿using Discord.Interactions;
+
+namespace BotTemplate.BotCore.Interactions.SlashCommands
 {
     public class AdminCommands : InteractionsCore
     {

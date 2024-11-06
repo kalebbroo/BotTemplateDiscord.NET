@@ -1,5 +1,4 @@
 ﻿global using Discord;
-global using Discord.Interactions;
 global using Discord.Rest;
 global using Discord.WebSocket;
 global using DotNetEnv.Configuration;
