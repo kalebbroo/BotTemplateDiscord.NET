@@ -1,13 +1,13 @@
 ﻿using Discord.Commands;
 
-namespace BotTemplate.BotCore.ContextCommands.Modules;
+namespace BotTemplate.BotCore.TextCommands.Modules;
 
 /// <summary>Contains general-purpose commands that any user can execute.
 /// Demonstrates basic command structure and parameter handling.</summary>
-public class UserModule(ILogger<UserModule> logger) : ContextCommandsCore
+public class UserModule(ILogger<UserModule> logger, CommandService command) : TextCommandsCore
 {
     private readonly ILogger<UserModule> _logger = logger;
-    private readonly CommandService _commands;
+    private readonly CommandService _commands = command;
 
     [Command("ping")]
     [Summary("Check the bot's latency.")]
@@ -15,7 +15,7 @@ public class UserModule(ILogger<UserModule> logger) : ContextCommandsCore
     {
         if (!await HandleCooldownAsync(Context.User, "ping"))
             return;
-        Int32 latency = Context.Client.Latency;
+        int latency = Context.Client.Latency;
         await ReplyAsync($"🏓 Pong! Latency: {latency}ms");
         _logger.LogDebug("{User} checked latency: {Latency}ms", Context.User, latency);
     }
@@ -52,50 +52,58 @@ public class UserModule(ILogger<UserModule> logger) : ContextCommandsCore
     [Command("help")]
     [Summary("Shows a list of available commands or info about a specific command.")]
     public async Task HelpAsync(
-        [Summary("The command to get help for")]
-        string command = null)
+    [Summary("The command to get help for")]
+    string textCommand = null)
     {
         if (!await HandleCooldownAsync(Context.User, "help"))
             return;
-        // Get all commands the user can use and loops through them displaying the command name and summary.
-        IEnumerable<CommandInfo> commands = _commands.Commands
-            .Where(c => !c.Module.Name.Equals("admin", StringComparison.OrdinalIgnoreCase));
-        if (string.IsNullOrEmpty(command))
+        if (string.IsNullOrEmpty(textCommand))
         {
+            // Show all commands
             EmbedBuilder embed = new EmbedBuilder()
                 .WithTitle("Available Commands")
-                .WithColor(Color.Green)
-                .WithDescription("Here are all the commands you can use:");
-            foreach (CommandInfo cmd in commands)
+                .WithColor(Color.Green);
+            StringBuilder description = new("Here are all the commands you can use:\n\n");
+            foreach (CommandInfo commandInfo in _commands.Commands)
             {
-                embed.AddField(
-                    $"!{cmd.Name}",
-                    cmd.Summary ?? "No description available.",
-                    inline: true);
+                // Skip admin commands
+                if (commandInfo.Module.Name.Equals("admin", StringComparison.OrdinalIgnoreCase))
+                    continue;
+                description.AppendLine($"`!{commandInfo.Name}` - {commandInfo.Summary ?? "No description available."}");
             }
+            embed.Description = description.ToString();
             await ReplyAsync(embed: embed.Build());
         }
         else
         {
             // Show help for specific command
-            CommandInfo? cmd = commands.FirstOrDefault(c =>
-                c.Name.Equals(command, StringComparison.OrdinalIgnoreCase) ||
-                c.Aliases.Any(a => a.Equals(command, StringComparison.OrdinalIgnoreCase)));
-            if (cmd == null)
+            CommandInfo? foundCommand = null;
+            foreach (CommandInfo commandInfo in _commands.Commands)
             {
-                await SendErrorAsync($"Command '{command}' not found.");
+                if (commandInfo.Module.Name.Equals("admin", StringComparison.OrdinalIgnoreCase))
+                    continue;
+                if (commandInfo.Name.Equals(textCommand, StringComparison.OrdinalIgnoreCase) ||
+                    commandInfo.Aliases.Any(a => a.Equals(textCommand, StringComparison.OrdinalIgnoreCase)))
+                {
+                    foundCommand = commandInfo;
+                    break;
+                }
+            }
+            if (foundCommand == null)
+            {
+                await SendErrorAsync($"Command '{textCommand}' not found.");
                 return;
             }
             EmbedBuilder embed = new EmbedBuilder()
-                .WithTitle($"Help - {cmd.Name}")
+                .WithTitle($"Help - {foundCommand.Name}")
                 .WithColor(Color.Blue)
-                .AddField("Description", cmd.Summary ?? "No description available.")
-                .AddField("Usage", $"!{cmd.Name} {string.Join(" ", cmd.Parameters.Select(p => $"<{p.Name}>"))}")
-                .AddField("Aliases", cmd.Aliases.Any() ? string.Join(", ", cmd.Aliases) : "None");
+                .AddField("Description", foundCommand.Summary ?? "No description available.")
+                .AddField("Usage", $"!{foundCommand.Name} {string.Join(" ", foundCommand.Parameters.Select(p => $"<{p.Name}>"))}")
+                .AddField("Aliases", foundCommand.Aliases.Any() ? string.Join(", ", foundCommand.Aliases) : "None");
             await ReplyAsync(embed: embed.Build());
         }
         _logger.LogDebug(
             "{User} requested help for {Command}",
-            Context.User, command ?? "all commands");
+            Context.User, textCommand ?? "all commands");
     }
 }

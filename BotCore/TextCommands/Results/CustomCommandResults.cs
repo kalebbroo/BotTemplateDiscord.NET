@@ -1,6 +1,6 @@
 ﻿using Discord.Commands;
 
-namespace BotTemplate.BotCore.ContextCommands.Results;
+namespace BotTemplate.BotCore.TextCommands.Results;
 
 // This is an optional class that can be used to create custom command results. Why use this? To provide superior error handling and more detailed command responses.
 // You dont need this and the use is a personal preference. You can remove this file if you dont want to use it.
@@ -32,7 +32,7 @@ public class CustomCommandResult : RuntimeResult
         : base(error, reason)
     {
         IsPartialSuccess = isPartialSuccess;
-        Details = details ?? new Dictionary<string, string>();
+        Details = details ?? [];
         ResultType = resultType;
     }
 

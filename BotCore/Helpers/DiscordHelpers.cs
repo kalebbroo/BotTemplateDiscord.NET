@@ -18,6 +18,10 @@ public static class DiscordHelpers
             InteractionService interactions = serviceProvider.GetRequiredService<InteractionService>();
             CommandService commands = serviceProvider.GetRequiredService<CommandService>();
 
+            // Scans the whole assembly for classes that define text commands and registers
+            // the command modules with the CommandService.
+            await commands.AddModulesAsync(Assembly.GetEntryAssembly(), serviceProvider);
+
             // In this section you need to choose whether to register commands globally or per guild. 
             // I normally register them per guild during development.
             // To register commands globally, move RegisterCommandsGloballyAsync() after AddModulesAsync() 

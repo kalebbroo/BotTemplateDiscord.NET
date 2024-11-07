@@ -1,19 +1,14 @@
 ﻿using Discord.Commands;
 
-namespace BotTemplate.BotCore.ContextCommands.Modules;
+namespace BotTemplate.BotCore.TextCommands.Modules;
 
 /// <summary>Contains administrative commands that require elevated permissions.
 /// Demonstrates how to use permission requirements and command groups.</summary>
 [Group("admin")]  // All commands in this module will be prefixed with "admin"
 [RequireUserPermission(GuildPermission.Administrator)]  // Requires administrator permission
-public class AdminModule : ContextCommandsCore
+public class AdminModule(ILogger<AdminModule> logger) : TextCommandsCore
 {
-    private readonly ILogger<AdminModule> _logger;
-
-    public AdminModule(ILogger<AdminModule> logger)
-    {
-        _logger = logger;
-    }
+    private readonly ILogger<AdminModule> _logger = logger;
 
     [Command("purge")]
     [Summary("Deletes a specified number of messages from the channel.")]

@@ -1,19 +1,15 @@
 ﻿using Discord.Commands;
 
-namespace BotTemplate.BotCore.ContextCommands;
+namespace BotTemplate.BotCore.TextCommands;
 
-/// <summary>
-/// Base class for all context command modules. Provides common functionality like cooldowns
-/// and helper methods that can be used across all command modules.
-/// </summary>
-public class ContextCommandsCore : ModuleBase<SocketCommandContext>
+/// <summary>Base class for all context command modules. Provides common functionality like cooldowns
+/// and helper methods that can be used across all command modules.</summary>
+public class TextCommandsCore : ModuleBase<SocketCommandContext>
 {
     private static readonly Dictionary<(ulong, string), DateTime> _lastInteracted = [];
     private static readonly TimeSpan Cooldown = TimeSpan.FromSeconds(3);
 
-    /// <summary>
-    /// Checks if a user is on cooldown for a specific command.
-    /// </summary>
+    /// <summary>Checks if a user is on cooldown for a specific command.</summary>
     /// <param name="user">The user to check</param>
     /// <param name="command">The command name</param>
     /// <returns>True if the user is on cooldown, false otherwise</returns>
@@ -31,10 +27,8 @@ public class ContextCommandsCore : ModuleBase<SocketCommandContext>
         return false;
     }
 
-    /// <summary>
-    /// Helper method to handle cooldown responses.
-    /// Use this in commands to ensure consistent cooldown handling.
-    /// </summary>
+    /// <summary>Helper method to handle cooldown responses.
+    /// Use this in commands to ensure consistent cooldown handling.</summary>
     /// <param name="user">The user to check</param>
     /// <param name="command">The command name</param>
     /// <returns>True if command should proceed (not on cooldown), false otherwise</returns>
@@ -48,17 +42,13 @@ public class ContextCommandsCore : ModuleBase<SocketCommandContext>
         return true;
     }
 
-    /// <summary>
-    /// Helper method to send error messages with consistent formatting.
-    /// </summary>
+    /// <summary>Helper method to send error messages with consistent formatting.</summary>
     protected async Task SendErrorAsync(string message)
     {
         await ReplyAsync($"❌ Error: {message}");
     }
 
-    /// <summary>
-    /// Helper method to send success messages with consistent formatting.
-    /// </summary>
+    /// <summary>Helper method to send success messages with consistent formatting.</summary>
     protected async Task SendSuccessAsync(string message)
     {
         await ReplyAsync($"✅ {message}");

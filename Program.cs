@@ -1,7 +1,7 @@
 ﻿using Discord.Interactions;
 using Discord.Commands;
-using BotTemplate.BotCore.ContextCommands;
 using BotTemplate.BotCore.Interactions.Buttons;
+using BotTemplate.BotCore.TextCommands;
 
 // This is the main entry point of the application and uses top-level statements instead of a traditional Main method. 
 // Top-level statements allow for a more concise and streamlined setup, especially for simple applications.
@@ -36,7 +36,7 @@ builder.Services.AddSingleton<IConfiguration>(configuration);
 // Configure Discord client
 builder.Services.AddSingleton(new DiscordSocketClient(new DiscordSocketConfig
 {
-    GatewayIntents = GatewayIntents.All,
+    GatewayIntents = GatewayIntents.All | GatewayIntents.MessageContent,
     LogLevel = LogSeverity.Debug
 }));
 
@@ -73,6 +73,7 @@ foreach (IHostedService hostedService in host.Services.GetServices<IHostedServic
 DiscordSocketClient discordClient = host.Services.GetRequiredService<DiscordSocketClient>();
 InteractionService interactionService = host.Services.GetRequiredService<InteractionService>();
 CommandHandler commandHandler = host.Services.GetRequiredService<CommandHandler>();
+CommandService commands = host.Services.GetRequiredService<CommandService>();
 
 // Attach an event handler for when an interaction is created.This handler creates a context and executes the appropriate command.
 // Learn more about the Interaction Framework: https://docs.discordnet.dev/guides/int_framework/intro.html
@@ -81,6 +82,11 @@ discordClient.InteractionCreated += async interaction =>
     SocketInteractionContext ctx = new(discordClient, interaction);
     await interactionService.ExecuteCommandAsync(ctx, host.Services);
 };
+
+// Hook MessageReceived so we can process each message to see if it qualifies as a command
+discordClient.MessageReceived += commandHandler.HandleCommandAsync;
+// Hook CommandExecuted to handle post-execution logic
+commands.CommandExecuted += commandHandler.OnCommandExecutedAsync;
 
 // Attach the LogMessage to both discordClient.Log and interactionService.Log. This will direct logs to our logger and output them accordingly.
 discordClient.Log += DiscordHelpers.LogMessageAsync;
@@ -91,7 +97,6 @@ discordClient.Ready += async () =>
 {
     // Initialize both interaction commands and traditional text commands
     await DiscordHelpers.ClientReady(host.Services);
-    await commandHandler.InitializeAsync();
 };
 
 // Initialize and register Classes that handle Discord events. I have all my event logic in one class (UserEvents) for organization.
