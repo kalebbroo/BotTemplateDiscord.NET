@@ -1,5 +1,6 @@
 ﻿using Discord.Interactions;
 using Discord.Commands;
+using BotTemplate.BotCore.Interactions.ContextCommands;
 
 namespace BotTemplate.BotCore.Helpers;
 
@@ -17,10 +18,14 @@ public static class DiscordHelpers
             DiscordSocketClient client = serviceProvider.GetRequiredService<DiscordSocketClient>();
             InteractionService interactions = serviceProvider.GetRequiredService<InteractionService>();
             CommandService commands = serviceProvider.GetRequiredService<CommandService>();
+            ContextHandler contextHandler = serviceProvider.GetRequiredService<ContextHandler>();
 
             // Scans the whole assembly for classes that define text commands and registers
             // the command modules with the CommandService.
             await commands.AddModulesAsync(Assembly.GetEntryAssembly(), serviceProvider);
+
+            // Register context menu commands with Discord
+            await contextHandler.RegisterContextCommands();
 
             // In this section you need to choose whether to register commands globally or per guild. 
             // I normally register them per guild during development.

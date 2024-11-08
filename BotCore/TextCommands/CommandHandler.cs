@@ -34,7 +34,7 @@ public class CommandHandler(DiscordSocketClient client, CommandService commands,
     }
 
     /// <summary>Handles post-execution logic for commands, such as logging and error handling.</summary>
-    public async Task OnCommandExecutedAsync(ICommandContext context, IResult result)
+    public async Task OnCommandExecutedAsync(Optional<CommandInfo> command, ICommandContext context, IResult result)
     {
         // Handle custom command results with detailed responses
         if (result is CustomCommandResult customResult)

@@ -4,7 +4,7 @@ namespace BotTemplate.BotCore.TextCommands.Modules;
 
 /// <summary>Contains administrative commands that require elevated permissions.
 /// Demonstrates how to use permission requirements and command groups.</summary>
-[Group("admin")]  // All commands in this module will be prefixed with "admin"
+[Group("admin")]  // All commands in this module will be prefixed with "admin" ie !admin purge 10
 [RequireUserPermission(GuildPermission.Administrator)]  // Requires administrator permission
 public class AdminModule(ILogger<AdminModule> logger) : TextCommandsCore
 {
