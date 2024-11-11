@@ -2,7 +2,6 @@
 using Discord.Commands;
 using BotTemplate.BotCore.Interactions.Buttons;
 using BotTemplate.BotCore.TextCommands;
-using BotTemplate.BotCore.Interactions.ContextCommands;
 
 // This is the main entry point of the application and uses top-level statements instead of a traditional Main method. 
 // Top-level statements allow for a more concise and streamlined setup, especially for simple applications.
@@ -44,8 +43,6 @@ builder.Services.AddSingleton(new DiscordSocketClient(new DiscordSocketConfig
 // Configure InteractionService for handling interactions from commands, buttons, modals, and selects
 builder.Services.AddSingleton(p => new InteractionService(p.GetRequiredService<DiscordSocketClient>()));
 
-builder.Services.AddSingleton<ContextHandler>();
-
 // Configure CommandService for handling traditional text-based commands (e.g., !help)
 // This is separate from InteractionService as it handles different types of commands
 builder.Services.AddSingleton(new CommandService(new CommandServiceConfig
@@ -77,7 +74,6 @@ DiscordSocketClient discordClient = host.Services.GetRequiredService<DiscordSock
 InteractionService interactionService = host.Services.GetRequiredService<InteractionService>();
 CommandHandler commandHandler = host.Services.GetRequiredService<CommandHandler>();
 CommandService commands = host.Services.GetRequiredService<CommandService>();
-ContextHandler contextHandler = host.Services.GetRequiredService<ContextHandler>();
 
 // Attach an event handler for when an interaction is created.This handler creates a context and executes the appropriate command.
 // Learn more about the Interaction Framework: https://docs.discordnet.dev/guides/int_framework/intro.html
@@ -87,14 +83,10 @@ discordClient.InteractionCreated += async interaction =>
     await interactionService.ExecuteCommandAsync(ctx, host.Services);
 };
 
-// Hook MessageReceived so we can process each message to see if it qualifies as a command
+// Hook MessageReceived so we can process each message to see if it qualifies as a text command
 discordClient.MessageReceived += commandHandler.HandleCommandAsync;
-// Hook CommandExecuted to handle post-execution logic
+// Hook CommandExecuted to handle post-execution logic for text commands
 commands.CommandExecuted += commandHandler.OnCommandExecutedAsync;
-
-// Hook event handlers for user and message context commands (commands from right clicking a user or message)
-discordClient.MessageCommandExecuted += contextHandler.HandleMessageCommand;
-discordClient.UserCommandExecuted += contextHandler.HandleUserCommand;
 
 // Attach the LogMessage to both discordClient.Log and interactionService.Log. This will direct logs to our logger and output them accordingly.
 discordClient.Log += DiscordHelpers.LogMessageAsync;
